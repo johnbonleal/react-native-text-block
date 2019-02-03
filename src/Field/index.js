@@ -1,58 +1,46 @@
 import React, { PureComponent } from 'react';
-import { View, StyleSheet, TextInput, Text } from 'react-native';
-import { Constants } from '../../configs';
+import { View, TextInput, Text } from 'react-native';
+import PropTypes from 'prop-types';
+import { COLOR_SUCCESS, COLOR_DARK_GRAY, COLOR_WHITE } from '../Util';
+import styles from './styles';
 
-class Field extends PureComponent {
+import Label from '../Label';
+
+export default class FieldComponent extends PureComponent {
     constructor(props) {
         super(props);
 
         this.state = {
             currentIndex: null
-        };
+        }
     }
-    
     render() {
         const { currentIndex } = this.state;
         const {
             index,
             item,
-            onChangeValue,
+            onChangeText,
             value,
             length,
             name
         } = this.props;
         return (
-            <View>
-                <View
-                    style={[
-                        styles.labelContainerStyle,
-                        (currentIndex === index || value[name]) && { left: 16, top: -12 }
-                    ]}
-                    pointerEvents={"none"}
-                >
-                    <Text
-                        style={[
-                            styles.labelStyle,
-                            (currentIndex === index || value[name]) && { fontSize: 12, fontWeight: 'normal' }
-                        ]}
-                    >
-                        {item}
-                    </Text>
-                </View>
+            <View style={{backgroundColor: COLOR_WHITE}}>
+                <Label isFocused={currentIndex===index} {...this.props} />
                 <View
                     style={[
                         styles.container,
                         index === 0 && styles.top,
                         index === length - 1 && styles.bottom,
-                        currentIndex === index - 1 && { borderTopWidth: 0 },
+                        currentIndex === index - 1 && { borderTopWidth: 0, borderBottomWidth: 0 },
                         currentIndex === index + 1 && { borderBottomWidth: 0 },
-                        currentIndex === index && { borderColor: Constants.COLOR_AVAILA_SECONDARY, borderTopWidth: 1, borderBottomWidth: 1 }
+                        currentIndex === index && { borderColor: COLOR_SUCCESS, borderTopWidth: 1, borderBottomWidth: 1 }
                     ]}
                 >
                     <TextInput
-                        style={{ width: '100%', fontWeight: 'bold', color: Constants.COLOR_DARK_GRAY }}
-                        onChangeText={onChangeValue ? (text) => onChangeValue(text, name) : null}
-                        value={value ? value.name : ""}
+                        style={{ width: '100%', fontWeight: 'bold', color: COLOR_DARK_GRAY }}
+                        onChangeText={onChangeText ? (text) => onChangeText(text, name) : null}
+                        value={value ? value[name] : ""}
                         onFocus={() => this.setState({ currentIndex: index })}
                         onBlur={() => this.setState({ currentIndex: null })}
                     />
@@ -63,43 +51,18 @@ class Field extends PureComponent {
     }
 }
 
-export default Field;
+FieldComponent.propTypes = {
+    index: PropTypes.number,
+    item: PropTypes.string,
+    onChangeText: PropTypes.func,
+    value: PropTypes.object,
+    length: PropTypes.number
+};
 
-const styles = StyleSheet.create({
-    labelContainerStyle: {
-        backgroundColor: Constants.COLOR_WHITE,
-        position: 'absolute',
-        left: 16,
-        top: 56 / 4,
-        paddingVertical: 3,
-        paddingHorizontal: 5,
-        zIndex: 99
-    },
-    labelStyle: {
-        fontSize: 15,
-        fontWeight: 'bold',
-        color: Constants.COLOR_LIGHT_GRAY
-    },
-    top: {
-        borderTopWidth: 1,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12
-    },
-    bottom: {
-        borderTopWidth: 0,
-        borderBottomLeftRadius: 12,
-        borderBottomRightRadius: 12
-    },
-    container: {
-        height: Constants.BUTTON_HEIGHT,
-        flexDirection: 'row',
-        borderColor: '#D8D8D8',
-        borderTopWidth: 0,
-        borderWidth: 1,
-        justifyContent: 'center',
-        paddingHorizontal: 16,
-        color: Constants.COLOR_DARK_GRAY,
-        fontWeight: 'bold',
-        fontSize: 15
-    }
-});
+FieldComponent.defaultProps = {
+    index: 0,
+    item: '',
+    onChangeText: () => {},
+    value: {},
+    length: 0
+};
